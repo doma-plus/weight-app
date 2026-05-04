@@ -69,7 +69,7 @@ async function loadData() {
 
   data = rows.slice(1).map(r => ({
     name: r[0],
-    date: r[1],
+    date: new Date(r[1]).toLocaleDateString("ja-JP"),
     weight: r[2],
     fat: r[3]
   }));
