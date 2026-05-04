@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>体重管理</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body { font-family: sans-serif; padding: 15px; }
+input, button {
+  width: 100%;
+  margin: 5px 0;
+  padding: 12px;
+  font-size: 16px;
+}
+button { background: #4CAF50; color: white; border: none; }
+</style>
+</head>
+
+<body>
+
+<h2>体重・体脂肪</h2>
+
+<input type="text" id="name" placeholder="名前">
+<input type="date" id="date">
+<input type="number" id="weight" placeholder="体重(kg)">
+<input type="number" id="fat" placeholder="体脂肪(%)">
+
+<button onclick="saveData()">記録する</button>
+
+<ul id="list"></ul>
+<canvas id="chart"></canvas>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbzkzLNdzoAnqhfNFhuyzCEaPMsAdg6uHhnMY55Uls19p5aVOljpSOk9Jju-LaDSUO8m/exec";
+
+let data = [];
+
+document.getElementById("date").value = new Date().toISOString().split("T")[0];
+
+async function saveData() {
+  const name = document.getElementById("name").value;
+  const date = document.getElementById("date").value;
+  const weight = document.getElementById("weight").value;
+  const fat = document.getElementById("fat").value;
+
+  if (!name || !weight || !fat) {
+    alert("入力してください");
+    return;
+  }
+
+  await fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify({ name, date, weight, fat })
+  });
+
+  document.getElementById("weight").value = "";
+  document.getElementById("fat").value = "";
+
+  loadData();
+}
+
+async function loadData() {
+  const res = await fetch(API_URL);
+  const rows = await res.json();
+
+  data = rows.slice(1).map(r => ({
+    name: r[0],
+    date: r[1],
+    weight: r[2],
+    fat: r[3]
+  }));
+
+  render();
+}
+
+function render() {
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+
+  data.forEach(d => {
+    const li = document.createElement("li");
+    li.textContent = `${d.name}：${d.date} ${d.weight}kg / ${d.fat}%`;
+    list.appendChild(li);
+  });
+
+  drawChart();
+}
+
+function drawChart() {
+  const ctx = document.getElementById("chart");
+
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: data.map(d => d.date),
+      datasets: [
+        { label: '体重', data: data.map(d => d.weight) },
+        { label: '体脂肪', data: data.map(d => d.fat) }
+      ]
+    }
+  });
+}
+
+// 初回読み込み
+loadData();
+</script>
+
+</body>
+</html>
