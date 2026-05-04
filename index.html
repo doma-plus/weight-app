@@ -37,7 +37,9 @@ const API_URL = "https://script.google.com/macros/s/AKfycbz0QUGG4hF9yP6slO7fNRX8
 
 let data = [];
 
-document.getElementById("date").value = new Date().toISOString().split("T")[0];
+const now = new Date();
+now.setHours(now.getHours() + 9);
+document.getElementById("date").value = now.toISOString().split("T")[0];
 
 async function saveData() {
   const name = document.getElementById("name").value;
