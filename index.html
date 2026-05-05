@@ -33,6 +33,8 @@ button { background: #4CAF50; color: white; border: none; }
 <canvas id="chart"></canvas>
 
 <script>
+  let chart;
+  
 const API_URL = "https://script.google.com/macros/s/AKfycbz0QUGG4hF9yP6slO7fNRX8KWLGRjsf7ujpactvJv0JkauZP9bEdslVdCLNtX1QwLvA/exec";
 
 let data = [];
@@ -97,14 +99,25 @@ data
 function drawChart() {
   const ctx = document.getElementById("chart");
 
+  const currentUser = document.getElementById("name").value;
+if (!currentUser) return;
+
+const filtered = data.filter(d => d.name === currentUser);
+
+  if (chart) {
+  chart.destroy();
+}
+  
   new Chart(ctx, {
     type: 'line',
     data: {
-      labels: data.map(d => d.date),
-      datasets: [
-        { label: '体重', data: data.map(d => d.weight) },
-        { label: '体脂肪', data: data.map(d => d.fat) }
-      ]
+      labels: filtered.map(d => d.date),
+datasets: [
+  { label: '体重', data: filtered.map(d => d.weight) },
+  { label: '体脂肪', data: filtered.map(d => d.fat) }
+]
+
+      
     }
   });
 }
