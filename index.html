@@ -81,9 +81,13 @@ function render() {
   const list = document.getElementById("list");
   list.innerHTML = "";
 
-  data.forEach(d => {
+  const currentUser = document.getElementById("name").value;
+
+data
+  .filter(d => d.name === currentUser)
+  .forEach(d => {
     const li = document.createElement("li");
-    li.textContent = `${d.name}：${d.date} ${d.weight}kg / ${d.fat}%`;
+    li.textContent = `${d.date} ${d.weight}kg / ${d.fat}%`;
     list.appendChild(li);
   });
 
